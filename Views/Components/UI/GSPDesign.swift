@@ -37,36 +37,16 @@ enum GSPDesign {
 
     static func font(_ style: GSPTextStyle) -> Font {
         switch style {
-        case .screenTitle:
-            // Big, Apple-ish header (Notes-like, but not rounded 34->38)
-            return .system(size: 38, weight: .bold, design: .default)
-
-        case .screenSubtitle:
-            return .system(size: 17, weight: .semibold, design: .default)
-
-        case .sectionTitle:
-            return .system(size: 17, weight: .semibold, design: .default)
-
-        case .rowTitle:
-            return .system(size: 17, weight: .semibold, design: .default)
-
-        case .rowSubtitle:
-            return .system(size: 15, weight: .regular, design: .default)
-
-        case .rowTrailing:
-            return .system(size: 15, weight: .semibold, design: .default)
-
-        case .pillTitle:
-            return .system(size: 20, weight: .semibold, design: .default)
-
-        case .pillSubtitle:
-            return .system(size: 15, weight: .semibold, design: .default)
-
-        case .sheetTitle:
-            return .system(size: 17, weight: .semibold, design: .default)
-
-        case .sheetAction:
-            return .system(size: 17, weight: .semibold, design: .default)
+        case .screenTitle:    return .largeTitle.bold()
+        case .screenSubtitle: return .subheadline
+        case .sectionTitle:   return .caption.weight(.semibold)
+        case .rowTitle:       return .body.weight(.semibold)
+        case .rowSubtitle:    return .subheadline
+        case .rowTrailing:    return .subheadline.weight(.semibold)
+        case .pillTitle:      return .title2.weight(.semibold)
+        case .pillSubtitle:   return .subheadline
+        case .sheetTitle:     return .title3.weight(.semibold)
+        case .sheetAction:    return .headline
         }
     }
 }
