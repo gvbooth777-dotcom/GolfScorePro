@@ -159,25 +159,40 @@ struct GSPPrimaryPill: View {
     var height: CGFloat = GSPUI.Size.postHeight
     var font: Font = GSPUI.Typography.post
     var shadowEnabled: Bool = true
+    var isGlass: Bool = false   // true when action is already complete (posted state)
 
     var body: some View {
         Text(title)
-            .foregroundStyle(.black.opacity(0.92))
+            .foregroundStyle(isGlass ? NotesTheme.accent : Color(UIColor { t in
+                t.userInterfaceStyle == .dark ? .black : .white
+            }))
             .font(font)
             .frame(maxWidth: .infinity)
             .frame(height: height)
-            .background(
-                RoundedRectangle(cornerRadius: GSPUI.Radius.pillPrimary, style: .continuous)
-                    .fill(accent)
-                    .shadow(
-                        color: Color.black.opacity(shadowEnabled ? 0.28 : 0.0),
-                        radius: shadowEnabled ? 14 : 0,
-                        x: 0,
-                        y: shadowEnabled ? 12 : 0
-                    )
-            )
+            .background(pillBackground)
             .contentShape(RoundedRectangle(cornerRadius: GSPUI.Radius.pillPrimary, style: .continuous))
             .accessibilityAddTraits(.isButton)
+    }
+
+    @ViewBuilder
+    private var pillBackground: some View {
+        if isGlass {
+            RoundedRectangle(cornerRadius: GSPUI.Radius.pillPrimary, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: GSPUI.Radius.pillPrimary, style: .continuous)
+                        .strokeBorder(NotesTheme.cardStroke, lineWidth: 1)
+                )
+        } else {
+            RoundedRectangle(cornerRadius: GSPUI.Radius.pillPrimary, style: .continuous)
+                .fill(accent)
+                .shadow(
+                    color: Color.black.opacity(shadowEnabled ? 0.28 : 0.0),
+                    radius: shadowEnabled ? 14 : 0,
+                    x: 0,
+                    y: shadowEnabled ? 12 : 0
+                )
+        }
     }
 }
 
@@ -196,7 +211,11 @@ struct GSPSecondaryPill: View {
             .frame(height: height)
             .background(
                 RoundedRectangle(cornerRadius: GSPUI.Radius.pillSecondary, style: .continuous)
-                    .fill(Color.white.opacity(0.10))
+                    .fill(.ultraThinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: GSPUI.Radius.pillSecondary, style: .continuous)
+                            .strokeBorder(NotesTheme.cardStroke, lineWidth: 1)
+                    )
             )
             .contentShape(RoundedRectangle(cornerRadius: GSPUI.Radius.pillSecondary, style: .continuous))
             .accessibilityAddTraits(.isButton)
@@ -267,7 +286,9 @@ struct GSPToastHUD: View {
 
     var body: some View {
         Text(text)
-            .foregroundStyle(.black.opacity(0.92))
+            .foregroundStyle(Color(UIColor { t in
+                t.userInterfaceStyle == .dark ? .black : .white
+            }))
             .font(GSPUI.Typography.headline)
             .lineLimit(1)
             .minimumScaleFactor(0.75)
