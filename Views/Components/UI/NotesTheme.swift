@@ -29,7 +29,7 @@ enum NotesTheme {
     static let cardStroke = Color(UIColor { t in
         t.userInterfaceStyle == .dark
             ? UIColor(white: 1, alpha: 0.14)
-            : UIColor(white: 1, alpha: 0.90)
+            : UIColor(white: 0, alpha: 0.12)  // dark ink — visible on light glass surfaces
     })
 
     // MARK: Divider
@@ -77,7 +77,7 @@ private struct GSPBackgroundView: View {
     var body: some View {
         LinearGradient(
             colors: colorScheme == .dark
-                ? [Color(hex: "0A0A0A"), Color(hex: "0D1A0D"), Color(hex: "0A120A")]
+                ? [Color(hex: "0A1A0A"), Color(hex: "0D1A0D"), Color(hex: "0A120A")]
                 : [Color(hex: "E8F5E9"), Color(hex: "F0FAF0"), Color(hex: "E0F2F1")],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
