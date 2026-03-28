@@ -61,7 +61,7 @@ enum NotesTheme {
     static let accentSoft = Color(UIColor { t in
         t.userInterfaceStyle == .dark
             ? UIColor(red: 0.290, green: 0.867, blue: 0.502, alpha: 0.18)
-            : UIColor(red: 0.086, green: 0.392, blue: 0.204, alpha: 0.12)
+            : UIColor(red: 0.086, green: 0.392, blue: 0.204, alpha: 0.22)
     })
 
     // MARK: Geometry
