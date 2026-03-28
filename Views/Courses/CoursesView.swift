@@ -169,17 +169,22 @@ struct CoursesView: View {
     // MARK: - Empty state
 
     private var emptyState: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("No courses yet")
-                .foregroundStyle(NotesTheme.textPrimary)
-                .font(.system(.title2, design: .default).weight(.semibold))
+        VStack(spacing: 16) {
+            Image(systemName: "mappin.circle.fill")
+                .font(.system(size: 48, weight: .regular))
+                .foregroundStyle(NotesTheme.textTertiary)
 
-            Text("Tap New Course to add your first course.")
+            Text("No Courses Yet")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(NotesTheme.textPrimary)
+
+            Text("Add a course to track par and stroke index.")
+                .font(.subheadline)
                 .foregroundStyle(NotesTheme.textSecondary)
-                .font(.system(.body, design: .default))
+                .multilineTextAlignment(.center)
         }
-        .padding(GSPUI.Spacing.cardPad)
-        .notesCard()
+        .frame(maxWidth: .infinity)
+        .padding(.top, 60)
     }
 
     // MARK: - Delete
@@ -203,11 +208,11 @@ private struct CourseRow: View {
 
             Button(action: onOpen) {
                 HStack(alignment: .center, spacing: GSPUI.Spacing.rowHStack) {
-                    GSPAvatarCircle(
-                        initials: initials(from: course.name),
-                        size: GSPUI.Size.avatar,
-                        fill: Color.white.opacity(0.14)
-                    )
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(NotesTheme.accent)
+                        .frame(width: 32, height: 32)
+                        .background(Circle().fill(NotesTheme.accentSoft))
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(course.name)
@@ -246,17 +251,4 @@ private struct CourseRow: View {
         .contentShape(Rectangle())
     }
 
-    private func initials(from text: String) -> String {
-        let parts = text
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .split(separator: " ")
-            .map(String.init)
-
-        if parts.isEmpty { return "?" }
-        if parts.count == 1 { return String(parts[0].prefix(2)).uppercased() }
-
-        let first = parts.first?.prefix(1) ?? ""
-        let last  = parts.last?.prefix(1) ?? ""
-        return "\(first)\(last)".uppercased()
-    }
 }

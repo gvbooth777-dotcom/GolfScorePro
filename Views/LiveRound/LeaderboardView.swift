@@ -69,15 +69,9 @@ struct LeaderboardView: View {
                         .padding(.horizontal, GSPUI.Spacing.insetX)
                         .padding(.top, 2)
                 } else {
-                    GSPListBlock {
-                        VStack(spacing: 0) {
-                            ForEach(sortedRows) { r in
-                                standingsRow(r)
-
-                                if r.id != sortedRows.last?.id {
-                                    GSPDivider(leading: GSPUI.Spacing.dividerLeading)
-                                }
-                            }
+                    VStack(spacing: 8) {
+                        ForEach(sortedRows) { r in
+                            standingsRow(r)
                         }
                     }
                 }
@@ -207,7 +201,7 @@ struct LeaderboardView: View {
                         .frame(height: 50)
                         .background(
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .fill(Color.white.opacity(mode == m ? 0.16 : 0.10))
+                                .fill(mode == m ? NotesTheme.cardStrong : NotesTheme.divider)
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -272,14 +266,25 @@ struct LeaderboardView: View {
                 .monospacedDigit()
         }
         .padding(.vertical, GSPUI.Spacing.rowVPad)
+        .padding(.horizontal, GSPUI.Spacing.cardPad)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 3)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(NotesTheme.cardStroke, lineWidth: 1)
+        )
+        .padding(.horizontal, GSPUI.Spacing.insetX)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(r.name), \(dText), total \(bigTotal)")
     }
 
     private func avatarFillColor(forRowID id: UUID) -> Color {
-        guard round.teamPlay else { return Color.white.opacity(0.14) }
-        guard let p = round.players.first(where: { $0.id == id }) else { return Color.white.opacity(0.14) }
+        guard round.teamPlay else { return NotesTheme.cardStrong }
+        guard let p = round.players.first(where: { $0.id == id }) else { return NotesTheme.cardStrong }
 
         switch p.team {
         case .a: return accent
@@ -344,7 +349,7 @@ struct LeaderboardView: View {
 
                     if row.id != matchRows.last?.id {
                         Divider()
-                            .overlay(Color.white.opacity(0.10))
+                            .overlay(NotesTheme.divider)
                             .padding(.leading, GSPUI.Spacing.insetX)
                     }
                 }
@@ -377,7 +382,7 @@ struct LeaderboardView: View {
 
             VStack(alignment: .trailing, spacing: 3) {
                 Text(row.statusText)
-                    .foregroundStyle(row.isLeading ? Color.green.opacity(0.8) : NotesTheme.textSecondary)
+                    .foregroundStyle(row.isLeading ? NotesTheme.accent : NotesTheme.textSecondary)
                     .font(.system(.body, design: .default).weight(.semibold))
                     .monospacedDigit()
 
@@ -419,7 +424,7 @@ struct LeaderboardView: View {
 
                     if row.id != skinsRows.last?.id {
                         Divider()
-                            .overlay(Color.white.opacity(0.10))
+                            .overlay(NotesTheme.divider)
                             .padding(.leading, GSPUI.Spacing.insetX)
                     }
                 }
@@ -445,7 +450,7 @@ struct LeaderboardView: View {
 
             VStack(alignment: .trailing, spacing: 3) {
                 Text("\(row.skinsWon)")
-                    .foregroundStyle(row.skinsWon > 0 ? Color.green.opacity(0.8) : NotesTheme.textTertiary)
+                    .foregroundStyle(row.skinsWon > 0 ? NotesTheme.accent : NotesTheme.textTertiary)
                     .font(.system(.title3, design: .default).weight(.bold))
                     .monospacedDigit()
 
@@ -476,7 +481,7 @@ struct LeaderboardView: View {
 
                     if p.id != round.players.last?.id {
                         Divider()
-                            .overlay(Color.white.opacity(0.10))
+                            .overlay(NotesTheme.divider)
                             .padding(.leading, GSPUI.Spacing.insetX)
                     }
                 }
@@ -579,7 +584,7 @@ struct LeaderboardView: View {
 
                         if hole < thruHole {
                             Divider()
-                                .overlay(Color.white.opacity(0.08))
+                                .overlay(NotesTheme.divider)
                                 .padding(.leading, GSPUI.Spacing.insetX)
                         }
                     }
@@ -663,7 +668,7 @@ struct LeaderboardView: View {
                    let player = input.players.first(where: { $0.id == winnerID }) {
                     let first = player.name.components(separatedBy: " ").first ?? player.name
                     Text("\(first) +\(outcome.skinsWon)")
-                        .foregroundStyle(Color.green.opacity(0.75))
+                        .foregroundStyle(NotesTheme.accent)
                         .font(.system(.caption, design: .default).weight(.semibold))
                         .monospacedDigit()
                 } else if outcome.carryOut > 0 {
@@ -740,7 +745,7 @@ struct LeaderboardView: View {
 
         return VStack(spacing: 0) {
             Divider()
-                .overlay(Color.white.opacity(0.08))
+                .overlay(NotesTheme.divider)
 
             VStack(spacing: 0) {
                 ForEach(input.players) { player in
@@ -809,7 +814,7 @@ struct LeaderboardView: View {
             if let outcome = skinsSummary?.holeOutcomes.first(where: { $0.holeNumber == hole }),
                outcome.winner == player.id {
                 Label("\(outcome.skinsWon) skin\(outcome.skinsWon == 1 ? "" : "s")", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(Color.green.opacity(0.75))
+                    .foregroundStyle(NotesTheme.accent)
                     .font(.system(.caption, design: .default).weight(.semibold))
             }
         case .matchPlay:
@@ -820,8 +825,8 @@ struct LeaderboardView: View {
     }
 
     private func holeDetailDeltaColor(_ delta: Int) -> Color {
-        if delta < 0 { return Color.green.opacity(0.75) }
-        if delta > 0 { return Color.red.opacity(0.75) }
+        if delta < 0 { return NotesTheme.accent }
+        if delta > 0 { return Color.red }
         return NotesTheme.textTertiary
     }
 
@@ -872,12 +877,12 @@ struct LeaderboardView: View {
                     let label: String
                     let color: Color
                     switch delta {
-                    case ...(-2): label = "EAG"; color = Color.green.opacity(0.75)
-                    case -1:      label = "BRD"; color = Color.green.opacity(0.75)
+                    case ...(-2): label = "EAG"; color = NotesTheme.accent
+                    case -1:      label = "BRD"; color = NotesTheme.accent
                     case  0:      label = "PAR"; color = NotesTheme.textTertiary
-                    case  1:      label = "BGY"; color = Color.red.opacity(0.75)
-                    case  2:      label = "DBL"; color = Color.red.opacity(0.75)
-                    default:      label = "+\(delta)"; color = Color.red.opacity(0.75)
+                    case  1:      label = "BGY"; color = Color.red
+                    case  2:      label = "DBL"; color = Color.red
+                    default:      label = "+\(delta)"; color = Color.red
                     }
                     return (label, count, color)
                 }
@@ -929,7 +934,7 @@ struct LeaderboardView: View {
 
                     if idx < statsPerPlayer.count - 1 {
                         Divider()
-                            .overlay(Color.white.opacity(0.08))
+                            .overlay(NotesTheme.divider)
                             .padding(.leading, GSPUI.Spacing.insetX)
                     }
                 }
@@ -966,9 +971,9 @@ struct LeaderboardView: View {
     // MARK: - Helpers
 
     private func deltaColor(_ d: Int) -> Color {
-        if d < 0 { return Color.green.opacity(0.75) }
-        if d > 0 { return Color.red.opacity(0.75) }
-        return NotesTheme.textSecondary
+        if d < 0 { return NotesTheme.accent }
+        if d > 0 { return Color.red }
+        return NotesTheme.textTertiary
     }
 
     private func deltaText(_ d: Int) -> String {

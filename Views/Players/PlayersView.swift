@@ -158,17 +158,22 @@ struct PlayersView: View {
     // MARK: - Empty state
 
     private var emptyState: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("No players yet")
-                .font(.system(size: 24, weight: .semibold, design: .default))
+        VStack(spacing: 16) {
+            Image(systemName: "person.fill")
+                .font(.system(size: 48, weight: .regular))
+                .foregroundStyle(NotesTheme.textTertiary)
+
+            Text("No Players Yet")
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(NotesTheme.textPrimary)
 
-            Text("You can add players here, or add them during Round Setup.")
-                .font(.system(size: 16, weight: .regular, design: .default))
+            Text("Add players to speed up round setup.")
+                .font(.subheadline)
                 .foregroundStyle(NotesTheme.textSecondary)
+                .multilineTextAlignment(.center)
         }
-        .padding(GSPUI.Spacing.cardPad)
-        .notesCard()
+        .frame(maxWidth: .infinity)
+        .padding(.top, 60)
     }
 
     // MARK: - Row
@@ -182,12 +187,11 @@ struct PlayersView: View {
     private func playerRow(_ player: Player) -> some View {
         HStack(alignment: .center, spacing: GSPUI.Spacing.rowHStack) {
 
-            // Restrained "avatar language" (same column width as LiveRound)
-            GSPAvatarCircle(
-                initials: initials(for: player.name),
-                size: GSPUI.Size.avatar,
-                fill: Color.white.opacity(0.14)
-            )
+            Image(systemName: "person.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(NotesTheme.accent)
+                .frame(width: 32, height: 32)
+                .background(Circle().fill(NotesTheme.accentSoft))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(player.name)

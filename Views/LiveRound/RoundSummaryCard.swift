@@ -36,26 +36,77 @@ struct RoundSummaryData {
 }
 
 // MARK: - RoundSummaryCard
+//
+// NOTE: This card renders via ImageRenderer to a UIImage for sharing.
+// .ultraThinMaterial is NOT renderable by ImageRenderer — keep solid fills.
 
 struct RoundSummaryCard: View {
 
     let data: RoundSummaryData
+
+    // MARK: - Adaptive colors (solid fills only — ImageRenderer requirement)
+
+    private static let cardBg = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 0.07, alpha: 1)
+            : UIColor(white: 0.97, alpha: 1)
+    })
+    private static let primaryText = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? .white
+            : UIColor(red: 0.102, green: 0.180, blue: 0.102, alpha: 1)
+    })
+    private static let text80 = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.80)
+            : UIColor(white: 0, alpha: 0.70)
+    })
+    private static let text55 = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.55)
+            : UIColor(white: 0, alpha: 0.45)
+    })
+    private static let text35 = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.35)
+            : UIColor(white: 0, alpha: 0.28)
+    })
+    private static let text30 = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.30)
+            : UIColor(white: 0, alpha: 0.25)
+    })
+    private static let text25 = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.25)
+            : UIColor(white: 0, alpha: 0.18)
+    })
+    private static let evenDelta = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.45)
+            : UIColor(white: 0, alpha: 0.35)
+    })
+    private static let text75 = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.75)
+            : UIColor(white: 0, alpha: 0.60)
+    })
 
     // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             headerBlock
-            Divider().overlay(Color.white.opacity(0.10))
+            Divider().overlay(NotesTheme.divider)
             standingsBlock
             footerBlock
         }
         .frame(width: 360)
-        .background(Color(white: 0.07))
+        .background(Self.cardBg)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
+                .strokeBorder(NotesTheme.cardStroke, lineWidth: 1)
         )
     }
 
@@ -65,32 +116,36 @@ struct RoundSummaryCard: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(data.courseName)
                 .font(.system(.title3, design: .default).weight(.semibold))
-                .foregroundStyle(Color.white)
+                .foregroundStyle(Self.primaryText)
                 .lineLimit(1)
 
             HStack(spacing: 6) {
                 Text(data.gameType.displayName)
                     .font(.system(.subheadline, design: .default))
-                    .foregroundStyle(Color.white.opacity(0.55))
+                    .foregroundStyle(Self.text55)
 
                 if data.gameType == .strokePlay {
                     Text("·")
-                        .foregroundStyle(Color.white.opacity(0.30))
+                        .foregroundStyle(Self.text30)
                     Text(data.useHandicaps ? "Net" : "Gross")
                         .font(.system(.subheadline, design: .default))
-                        .foregroundStyle(Color.white.opacity(0.55))
+                        .foregroundStyle(Self.text55)
                 }
 
                 Text("·")
-                    .foregroundStyle(Color.white.opacity(0.30))
+                    .foregroundStyle(Self.text30)
                 Text("Thru \(data.thruHole)")
                     .font(.system(.subheadline, design: .default))
-                    .foregroundStyle(Color.white.opacity(0.55))
+                    .foregroundStyle(Self.text55)
             }
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
         .padding(.bottom, 16)
+        .background(
+            Rectangle()
+                .fill(NotesTheme.accentSoft)
+        )
     }
 
     // MARK: - Standings block
@@ -102,7 +157,7 @@ struct RoundSummaryCard: View {
 
                 if idx < data.rows.count - 1 {
                     Divider()
-                        .overlay(Color.white.opacity(0.07))
+                        .overlay(NotesTheme.divider)
                         .padding(.leading, 20)
                 }
             }
@@ -120,7 +175,7 @@ struct RoundSummaryCard: View {
         return HStack(spacing: 12) {
             Text("\(position)")
                 .font(.system(size: 13, weight: .semibold, design: .default))
-                .foregroundStyle(Color.white.opacity(0.35))
+                .foregroundStyle(Self.text35)
                 .frame(width: 20, alignment: .center)
                 .monospacedDigit()
 
@@ -128,7 +183,7 @@ struct RoundSummaryCard: View {
                 .font(isWinner
                     ? .system(.title3, design: .default).weight(.bold)
                     : .system(.body, design: .default).weight(.medium))
-                .foregroundStyle(isWinner ? Color.white : Color.white.opacity(0.80))
+                .foregroundStyle(isWinner ? Self.primaryText : Self.text80)
                 .lineLimit(1)
 
             Spacer(minLength: 8)
@@ -144,7 +199,7 @@ struct RoundSummaryCard: View {
                 .font(isWinner
                     ? .system(size: 28, weight: .bold, design: .default)
                     : .system(.title3, design: .default).weight(.semibold))
-                .foregroundStyle(isWinner ? Color.white : Color.white.opacity(0.75))
+                .foregroundStyle(isWinner ? Self.primaryText : Self.text75)
                 .monospacedDigit()
                 .frame(minWidth: 32, alignment: .trailing)
         }
@@ -158,13 +213,13 @@ struct RoundSummaryCard: View {
         HStack {
             Text("Par \(data.coursePar)")
                 .font(.system(size: 13, weight: .medium, design: .default))
-                .foregroundStyle(Color.white.opacity(0.30))
+                .foregroundStyle(Self.text30)
 
             Spacer()
 
             Text("GolfScorePro")
                 .font(.system(size: 13, weight: .semibold, design: .default))
-                .foregroundStyle(Color.white.opacity(0.25))
+                .foregroundStyle(Self.text25)
         }
         .padding(.horizontal, 20)
         .padding(.top, 12)
@@ -179,9 +234,9 @@ struct RoundSummaryCard: View {
     }
 
     private func deltaColor(_ d: Int) -> Color {
-        if d < 0 { return Color.green.opacity(0.80) }
-        if d > 0 { return Color.red.opacity(0.80) }
-        return Color.white.opacity(0.45)
+        if d < 0 { return Color.accentColor }
+        if d > 0 { return Color.red }
+        return Self.evenDelta
     }
 }
 

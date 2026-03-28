@@ -55,7 +55,7 @@ struct RoundSetupView: View {
     // MARK: - Team (UI + persistence via PlayerTeam)
 
     private func teamFill(_ team: PlayerTeam?) -> Color {
-        guard let team else { return Color.white.opacity(0.14) } // neutral
+        guard let team else { return NotesTheme.cardStroke } // neutral
         switch team {
         case .a: return Color.accentColor
         case .b: return Color.secondary.opacity(0.30)
@@ -319,48 +319,83 @@ struct RoundSetupView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("Game")
 
-            GSPListBlock {
-                VStack(spacing: 0) {
-                    ForEach(GameType.allCases) { g in
-                        FlatChevronRow(
-                            title: g.title,
-                            subtitle: g.subtitle,
-                            trailing: (game == g) ? "✓" : nil
-                        ) {
-                            HapticsManager.light()
-                            focusedPlayerIndex = nil
-                            game = g
-                            storedGameRaw = g.rawValue
-                            // Match Play requires team play — force it on and lock the toggle.
-                            if g == .matchPlay {
-                                teamPlay = true
-                                autoAssignTeamsIfNeeded()
-                            } else {
-                                // Restore the user's previous team play preference.
-                                teamPlay = storedTeamPlay
-                                if teamPlay { autoAssignTeamsIfNeeded() }
-                            }
-                        }
-
-                        if g.id != GameType.allCases.last?.id {
-                            GSPDivider(leading: GSPUI.Spacing.dividerLeading)
-                        }
-                    }
-
-                    // divider between last game and More Games
-                    GSPDivider(leading: GSPUI.Spacing.dividerLeading)
-
-                    FlatChevronRow(
-                        title: "More Games",
-                        subtitle: "Future game formats",
-                        trailingSystemImage: "ellipsis"
-                    ) {
+            VStack(spacing: 10) {
+                ForEach(GameType.allCases) { g in
+                    Button {
                         HapticsManager.light()
                         focusedPlayerIndex = nil
-                        showMoreGamesMenu = true
+                        game = g
+                        storedGameRaw = g.rawValue
+                        if g == .matchPlay {
+                            teamPlay = true
+                            autoAssignTeamsIfNeeded()
+                        } else {
+                            teamPlay = storedTeamPlay
+                            if teamPlay { autoAssignTeamsIfNeeded() }
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(g.title)
+                                .gspFont(.rowTitle)
+                                .foregroundStyle(NotesTheme.textPrimary)
+                            Text(g.subtitle)
+                                .gspFont(.rowSubtitle)
+                                .foregroundStyle(NotesTheme.textSecondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(game == g ? NotesTheme.accentSoft : Color.clear)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .strokeBorder(
+                                    game == g ? NotesTheme.accent : NotesTheme.cardStroke,
+                                    lineWidth: game == g ? 2 : 1
+                                )
+                        )
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(.ultraThinMaterial)
+                        )
                     }
+                    .buttonStyle(.plain)
                 }
+
+                Button {
+                    HapticsManager.light()
+                    focusedPlayerIndex = nil
+                    showMoreGamesMenu = true
+                } label: {
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("More Games")
+                                .gspFont(.rowTitle)
+                                .foregroundStyle(NotesTheme.textPrimary)
+                            Text("Future game formats")
+                                .gspFont(.rowSubtitle)
+                                .foregroundStyle(NotesTheme.textSecondary)
+                        }
+                        Spacer(minLength: 0)
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 16, weight: .semibold, design: .default))
+                            .foregroundStyle(NotesTheme.textTertiary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .strokeBorder(NotesTheme.cardStroke, lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
             }
+            .padding(.horizontal, GSPUI.Spacing.insetX)
 
             // Toggles retain their “card” feel but spacing matches the system now.
             toggleCard(
@@ -437,11 +472,11 @@ struct RoundSetupView: View {
                         .frame(height: 42)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(Color.white.opacity(0.10))
+                                .fill(.ultraThinMaterial)
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .strokeBorder(NotesTheme.divider, lineWidth: 1)
+                                .strokeBorder(NotesTheme.cardStroke, lineWidth: 1)
                         )
                 }
                 .buttonStyle(.plain)
@@ -507,7 +542,7 @@ struct RoundSetupView: View {
             set: { players[idx] = $0 }
         )
 
-        let fill = teamPlay ? teamFill(binding.wrappedValue.team) : Color.white.opacity(0.14)
+        let fill = teamPlay ? teamFill(binding.wrappedValue.team) : NotesTheme.cardStroke
 
         return VStack(alignment: .leading, spacing: 0) {
 
@@ -530,12 +565,12 @@ struct RoundSetupView: View {
                     } else {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: GSPUI.Size.avatar * 0.38, weight: .semibold))
-                            .foregroundStyle(Color.white.opacity(0.55))
+                            .foregroundStyle(NotesTheme.textSecondary)
                             .frame(width: GSPUI.Size.avatar, height: GSPUI.Size.avatar)
                             .background(
                                 Circle()
-                                    .fill(Color.white.opacity(0.10))
-                                    .overlay(Circle().stroke(Color.white.opacity(0.18), lineWidth: 1))
+                                    .fill(NotesTheme.card)
+                                    .overlay(Circle().stroke(NotesTheme.cardStroke, lineWidth: 1))
                             )
                     }
                 }
@@ -587,7 +622,7 @@ struct RoundSetupView: View {
                     } label: {
                         Image(systemName: "minus.circle.fill")
                             .font(.system(size: 22, weight: .semibold, design: .default))
-                            .foregroundStyle(Color.white.opacity(0.35))
+                            .foregroundStyle(NotesTheme.textTertiary)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Remove player")
@@ -616,7 +651,7 @@ struct RoundSetupView: View {
                                 .frame(minWidth: 80, minHeight: 36)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .fill(isSelected ? teamFill(team) : Color.white.opacity(0.06))
+                                        .fill(isSelected ? teamFill(team) : NotesTheme.card)
                                 )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -671,11 +706,18 @@ struct RoundSetupView: View {
                 .frame(height: 44)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(holes == n ? Color.white.opacity(0.16) : Color.white.opacity(0.10))
+                        .fill(holes == n ? NotesTheme.accentSoft : Color.clear)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .strokeBorder(NotesTheme.divider, lineWidth: 1)
+                        .strokeBorder(
+                            holes == n ? NotesTheme.accent : NotesTheme.cardStroke,
+                            lineWidth: holes == n ? 2 : 1
+                        )
+                )
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(.ultraThinMaterial)
                 )
         }
         .buttonStyle(.plain)

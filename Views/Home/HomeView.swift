@@ -78,56 +78,40 @@ struct HomeView: View {
                             .padding(.horizontal, GSPUI.Spacing.insetX)
                             .padding(.top, 6)
 
-                        VStack(spacing: 0) {
-
+                        VStack(spacing: 10) {
                             NavigationLink(value: Route.rounds) {
                                 NotesChevronRowLabel(
                                     title: "Rounds",
                                     subtitle: "View • Delete",
-                                    trailing: ""
+                                    trailing: "",
+                                    icon: "flag.fill"
                                 )
-                                .padding(.vertical, GSPUI.Spacing.rowVPad)
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
-
-                            Divider()
-                                .overlay(Color.white.opacity(GSPUI.Opacity.divider))
-                                .padding(.leading, GSPUI.Spacing.insetX)
 
                             NavigationLink(value: Route.courses) {
                                 NotesChevronRowLabel(
                                     title: "Courses",
                                     subtitle: "Select • Add • Edit",
-                                    trailing: ""
+                                    trailing: "",
+                                    icon: "mappin.circle.fill"
                                 )
-                                .padding(.vertical, GSPUI.Spacing.rowVPad)
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
-
-                            Divider()
-                                .overlay(Color.white.opacity(GSPUI.Opacity.divider))
-                                .padding(.leading, GSPUI.Spacing.insetX)
 
                             NavigationLink(value: Route.players) {
                                 NotesChevronRowLabel(
                                     title: "Players",
                                     subtitle: "Optional • For faster setup",
-                                    trailing: ""
+                                    trailing: "",
+                                    icon: "person.fill"
                                 )
-                                .padding(.vertical, GSPUI.Spacing.rowVPad)
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
                         }
-                        .padding(.horizontal, GSPUI.Spacing.insetX)
-                        .background(NotesTheme.cardStrong)
-                        .clipShape(RoundedRectangle(cornerRadius: NotesTheme.rowRadius, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: NotesTheme.rowRadius, style: .continuous)
-                                .strokeBorder(NotesTheme.divider, lineWidth: 1)
-                        )
                         .padding(.horizontal, GSPUI.Spacing.insetX)
                     }
 
@@ -191,31 +175,39 @@ struct HomeView: View {
 
     private func heroActionPill(title: String, subtitle: String) -> some View {
         HStack(spacing: GSPUI.Spacing.rowHStack) {
-
             VStack(alignment: .leading, spacing: 8) {
                 Text(title)
-                    .font(.system(size: 32, weight: .semibold, design: .default))
-                    .foregroundStyle(.black.opacity(0.92))
+                    .font(.system(size: 28, weight: .semibold, design: .default))
+                    .foregroundStyle(NotesTheme.textPrimary)
                     .lineLimit(1)
 
                 Text(subtitle)
-                    .font(.system(size: 18, weight: .regular, design: .default))
-                    .foregroundStyle(.black.opacity(0.70))
+                    .font(.subheadline)
+                    .foregroundStyle(NotesTheme.textSecondary)
                     .lineLimit(1)
             }
 
             Spacer(minLength: 12)
 
-            Image(systemName: "chevron.right")
-                .font(.system(size: 18, weight: .semibold, design: .default))
-                .foregroundStyle(.black.opacity(GSPUI.Opacity.chevron))
+            Image(systemName: "arrow.right.circle.fill")
+                .font(.system(size: 28, weight: .semibold))
+                .foregroundStyle(NotesTheme.accent)
         }
         .padding(.horizontal, 22)
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: 96)
         .background(
             RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .fill(accent)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 32, style: .continuous)
+                        .fill(NotesTheme.accentSoft)
+                )
+                .shadow(color: .black.opacity(0.07), radius: 16, x: 0, y: 6)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
+                .strokeBorder(NotesTheme.cardStroke, lineWidth: 1)
         )
         .contentShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
     }

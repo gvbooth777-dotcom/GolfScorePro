@@ -149,6 +149,55 @@ struct LiveRoundView: View {
         .background(NotesTheme.bg)
     }
 
+    // MARK: - Hole Hero Header
+
+    private var holeHero: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("HOLE")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(NotesTheme.textTertiary)
+                    .kerning(1)
+                Text("\(round.currentHole)")
+                    .font(.system(size: 72, weight: .black, design: .default))
+                    .foregroundStyle(NotesTheme.textPrimary)
+                    .monospacedDigit()
+            }
+
+            Spacer()
+
+            HStack(spacing: 8) {
+                holeChip(value: "\(currentPar)", label: "Par")
+                holeChip(value: "\(currentSI)", label: "SI")
+            }
+            .padding(.bottom, 8)
+        }
+        .padding(.horizontal, GSPUI.Spacing.insetX)
+        .padding(.top, 4)
+    }
+
+    private func holeChip(value: String, label: String) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(NotesTheme.textPrimary)
+                .monospacedDigit()
+            Text(label)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(NotesTheme.textTertiary)
+        }
+        .frame(width: 48, height: 48)
+        .notesCard(cornerRadius: 12)
+    }
+
+    private var holeCourseLabel: some View {
+        Text(round.courseName)
+            .font(.caption)
+            .foregroundStyle(NotesTheme.textTertiary)
+            .padding(.horizontal, GSPUI.Spacing.insetX)
+            .padding(.bottom, 2)
+    }
+
     // MARK: - Player Row (Net only if strokes received)
 
     private func playerRow(_ player: Player) -> some View {
@@ -176,16 +225,24 @@ struct LiveRoundView: View {
                     fill: avatarFillColor(for: player)
                 )
 
-                HStack(spacing: 10) {
-                    Text(label)
-                        .foregroundStyle(labelColor)
-                        .font(.system(.title3, design: .default).weight(.semibold))
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 8) {
+                        Text(label)
+                            .foregroundStyle(labelColor)
+                            .font(.system(.title3, design: .default).weight(.semibold))
 
-                    // ✅ Only show Net if they receive a stroke on THIS hole
-                    if received > 0 {
-                        Text("• Net \(netStrokes)")
+                        if received > 0 {
+                            Text("Net \(netStrokes)")
+                                .foregroundStyle(NotesTheme.textSecondary)
+                                .font(.system(.subheadline, design: .default))
+                                .monospacedDigit()
+                        }
+                    }
+
+                    if let total = runningTotal(for: player) {
+                        Text(total)
+                            .font(.caption)
                             .foregroundStyle(NotesTheme.textSecondary)
-                            .font(.system(.body, design: .default).weight(.regular))
                             .monospacedDigit()
                     }
                 }
@@ -202,8 +259,18 @@ struct LiveRoundView: View {
                     .font(.system(size: 16, weight: .semibold, design: .default))
                     .foregroundStyle(NotesTheme.textTertiary)
             }
-            .padding(.vertical, 16)
-            .contentShape(Rectangle())
+            .padding(.vertical, 14)
+            .padding(.horizontal, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .shadow(color: .black.opacity(0.07), radius: 14, x: 0, y: 4)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(NotesTheme.divider, lineWidth: 1)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
         .buttonStyle(.plain)
     }
@@ -254,6 +321,18 @@ struct LiveRoundView: View {
         if d < 0 { return Color.green.opacity(0.75) }
         if d > 0 { return Color.red.opacity(0.75) }
         return NotesTheme.textSecondary
+    }
+
+    private func runningTotal(for player: Player) -> String? {
+        let posted = round.scores.filter {
+            $0.player.id == player.id && $0.holeNumber < round.currentHole
+        }
+        guard !posted.isEmpty else { return nil }
+        let totalStrokes = posted.reduce(0) { $0 + $1.strokes }
+        let totalPar = posted.map(\.holeNumber).reduce(0) { $0 + round.parForHole($1) }
+        let delta = totalStrokes - totalPar
+        let deltaStr = delta == 0 ? "E" : (delta < 0 ? "\(delta)" : "+\(delta)")
+        return "\(deltaStr) thru \(posted.count)"
     }
 
     // MARK: - Bottom Bar
@@ -1072,10 +1151,8 @@ struct LiveRoundView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 16) {
 
-                NotesScreenTitle(
-                    "Hole \(round.currentHole)",
-                    subtitle: headerSubtitle
-                )
+                holeHero
+                holeCourseLabel
 
                 holeContextStrip
 
@@ -1107,19 +1184,12 @@ struct LiveRoundView: View {
             return teamA + teamB
         }()
 
-        return VStack(spacing: 0) {
+        return VStack(spacing: 10) {
             ForEach(orderedPlayers, id: \.id) { player in
                 playerRow(player)
-
-                if player.id != orderedPlayers.last?.id {
-                    Divider()
-                        .overlay(Color.white.opacity(0.10))
-                        .padding(.leading, 78)
-                }
+                    .padding(.horizontal, GSPUI.Spacing.insetX)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 2)
     }
 
     private var toastLayer: some View {

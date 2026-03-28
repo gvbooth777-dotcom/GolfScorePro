@@ -140,17 +140,22 @@ struct RoundsView: View {
     // MARK: - Empty state
 
     private var emptyState: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("No rounds yet")
-                .foregroundStyle(NotesTheme.textPrimary)
-                .font(.system(.title2, design: .default).weight(.semibold))
+        VStack(spacing: 16) {
+            Image(systemName: "flag.fill")
+                .font(.system(size: 48, weight: .regular))
+                .foregroundStyle(NotesTheme.textTertiary)
 
-            Text("Start a new round from Home to begin.")
+            Text("No Rounds Yet")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(NotesTheme.textPrimary)
+
+            Text("Start a round from the home screen.")
+                .font(.subheadline)
                 .foregroundStyle(NotesTheme.textSecondary)
-                .font(.system(.body, design: .default))
+                .multilineTextAlignment(.center)
         }
-        .padding(GSPUI.Spacing.cardPad)
-        .notesCard()
+        .frame(maxWidth: .infinity)
+        .padding(.top, 60)
     }
 
     // MARK: - Delete
@@ -188,11 +193,11 @@ private struct RoundRow: View {
             Button(action: onOpen) {
                 HStack(alignment: .center, spacing: GSPUI.Spacing.rowHStack) {
 
-                    GSPAvatarCircle(
-                        initials: initials(from: round.courseName),
-                        size: GSPUI.Size.avatar,
-                        fill: Color.white.opacity(0.14)
-                    )
+                    Image(systemName: "flag.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(NotesTheme.accent)
+                        .frame(width: 32, height: 32)
+                        .background(Circle().fill(NotesTheme.accentSoft))
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(round.courseName)
@@ -233,19 +238,6 @@ private struct RoundRow: View {
         .contentShape(Rectangle())
     }
 
-    private func initials(from text: String) -> String {
-        let parts = text
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .split(separator: " ")
-            .map(String.init)
-
-        if parts.isEmpty { return "?" }
-        if parts.count == 1 { return String(parts[0].prefix(2)).uppercased() }
-
-        let first = parts.first?.prefix(1) ?? ""
-        let last  = parts.last?.prefix(1) ?? ""
-        return "\(first)\(last)".uppercased()
-    }
 }
 
 private struct StatusTag: View {
